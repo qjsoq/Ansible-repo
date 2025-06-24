@@ -14,33 +14,6 @@
 #     extra_args: --break-system-packages
 #     executable: pip3
 
-# - name: Ensure .kube directory exists for root user
-#   file:
-#     path: /root/.kube
-#     state: directory
-#     mode: '0700'
-
-# - name: Copy kubeconfig for root user
-#   ansible.builtin.copy:
-#     src: /etc/rancher/k3s/k3s.yaml
-#     dest: /root/.kube/config
-#     remote_src: yes
-#     mode: '0600'
-- name: Debug full db_secret_result
-  debug:
-    var: db_secret_result
-
-- name: Debug decoded secrets
-  debug:
-    msg: |
-      Decoded Secrets:
-      -----------------
-      DB User: {{ db_user }}
-      DB Password: {{ db_password }}
-      DB Name: {{ db_name }}
-      DB Host: {{ db_host }}
-      DB Port: {{ db_port }}
-      GKE Ingress IP: {{ gke_ingress_ip }}
 
 - name: Create a k8s namespace
   kubernetes.core.k8s:
@@ -86,3 +59,19 @@
   tags:
     - deployment
 
+- name: Apply Ingress
+  kubernetes.core.k8s:
+    state: present
+    template: "{{ role_path }}/templates/app-ingress.yaml.j2"
+  loop: "{{ ingress }}"
+  tags:
+    - ingress
+
+- name: Apply Cert
+  kubernetes.core.k8s:
+    state: present
+    template: "{{ role_path }}/templates/app-certificate.yaml.j2"
+    namespace: "{{ namespace | default('app-ingress') }}"
+  loop: "{{ ingress }}"
+  tags:
+    - cert

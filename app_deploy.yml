@@ -1,26 +1,4 @@
 ---
-- name: Load Kubernetes secrets
-  hosts: localhost
-  gather_facts: false
-  tasks:
-
-    - name: Get DB secret
-      kubernetes.core.k8s_info:
-        api_version: v1
-        kind: Secret
-        name: db-secret
-        namespace: jenkins
-      register: db_secret_result
-
-    - name: Set secret facts
-      set_fact:
-        db_user: "{{ db_secret_result.resources[0].data.db_user | b64decode }}"
-        db_password: "{{ db_secret_result.resources[0].data.db_password | b64decode }}"
-        db_name: "{{ db_secret_result.resources[0].data.db_name | b64decode }}"
-        db_host: "{{ db_secret_result.resources[0].data.db_host | b64decode }}"
-        db_port: "{{ db_secret_result.resources[0].data.db_port | b64decode }}"
-        gke_ingress_ip: "{{ db_secret_result.resources[0].data.gke_ingress_ip | b64decode }}"
-
 - name: Deploy application
   hosts: localhost
   vars_files:
@@ -38,4 +16,4 @@
   roles:
     - cert_manager
     - nginx_ingress_controller
-
+    - cert_jenkins
