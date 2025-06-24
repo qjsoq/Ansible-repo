@@ -14,7 +14,22 @@
 #     extra_args: --break-system-packages
 #     executable: pip3
 
+- name: Debug full db_secret_result
+  debug:
+    var: db_secret_result
 
+- name: Debug decoded secrets
+  debug:
+    msg: |
+      Decoded Secrets:
+      -----------------
+      DB User: {{ db_user }}
+      DB Password: {{ db_password }}
+      DB Name: {{ db_name }}
+      DB Host: {{ db_host }}
+      DB Port: {{ db_port }}
+      GKE Ingress IP: {{ gke_ingress_ip }}
+      
 - name: Create a k8s namespace
   kubernetes.core.k8s:
     name: "{{ item.name }}"
