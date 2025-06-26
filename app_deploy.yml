@@ -28,7 +28,7 @@
     - nginx_ingress_controller
     - cert_jenkins
 
-- name: Deploy application test7
+- name: Deploy application test8
   hosts: localhost
   vars_files:
     - "{{ config_path }}"
